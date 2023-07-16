@@ -1,0 +1,28 @@
+---
+# tasks file for mgmt
+
+- name: "Add 32bit Arch"
+  command: dpkg --add-architecture i386
+
+- name: "Update Apt Cache"
+  command: apt-get update warn=no
+
+- name: "Add 32bit PAM"
+  command: apt-get install -y libpam0g:i386 warn=no
+
+- name: Install Db2 PreReqs
+  ansible.builtin.apt:
+    pkg:
+    - lib32stdc++6
+    
+- name: Create a symlink of libpam 32bit for Db2
+  ansible.builtin.file:
+    src: /lib/i386-linux-gnu/libpam.so.0
+    dest: /lib/libpam.so
+    owner: root
+    group: root
+    state: link
+    
+- name: Reboot target host
+  ansible.builtin.reboot:
+    reboot_timeout: 180

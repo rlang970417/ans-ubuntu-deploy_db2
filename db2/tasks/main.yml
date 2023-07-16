@@ -1,0 +1,30 @@
+---
+# tasks file for mgmt
+
+- name: Creating target directory
+  ansible.builtin.file:
+    path: /opt/ibm/db2/deploy
+    state: directory
+    owner: root
+    group: bin
+    mode: '0755'
+
+- name: Deploying Db2 Installer Archive
+  ansible.builtin.unarchive:
+    src: v11.5.8_linuxx64_server_dec.tar.gz
+    dest: /opt/ibm/db2/deploy
+
+- name: Deploying Db2 Installer Respone File
+  ansible.builtin.copy:
+    src: db2server.rsp
+    dest: /opt/ibm/db2/deploy
+    owner: root
+    group: bin
+    mode: 0644
+    
+- name: Installing Db2
+  ansible.builtin.command: /opt/ibm/db2/deploy/server_dec/db2setup -r /opt/ibm/db2/deploy/db2server.rsp
+  register: out
+
+# Display output from the previous command
+- debug: msg={{ out.stdout.splitlines() }}

@@ -1,0 +1,4 @@
+---
+# vars file for mgmt
+ansible_python_interpreter: /usr/bin/python3
+mypassword: "IbM_Sup3r_Pa55"

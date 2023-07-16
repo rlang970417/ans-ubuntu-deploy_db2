@@ -1,0 +1,12 @@
+---
+- name: "Ubuntu - Db2 Deployment Playbook"
+  hosts: "ubu"
+  remote_user: root
+  become: yes
+  serial: 10
+
+  roles:
+   - update
+   - 32bit
+   - prereqs
+   - db2

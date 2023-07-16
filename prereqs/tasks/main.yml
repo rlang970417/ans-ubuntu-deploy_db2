@@ -1,0 +1,97 @@
+---
+# tasks file for mgmt
+# Install Db2 11.5.8 on Ubuntu 20.04
+# REF : https://r2schools.com/how-to-install-ibm-db2-in-ubuntu/
+
+# Needed for Db2 UDB - Installation & Operation
+- name: Ensure group db2grp1 exists with correct gid
+  ansible.builtin.group:
+    name: db2grp1
+    state: present
+    gid: 2001
+    
+# Needed for Db2 UDB - Security
+- name: Ensure group db2fgrp1 exists with correct gid
+  ansible.builtin.group:
+    name: db2fgrp1
+    state: present
+    gid: 2002
+
+# *** Legacy - No longer needed after 10.5.x ***    
+# Needed for Db2 UDB - Administration
+- name: Ensure group dasadm1 exists with correct gid
+  ansible.builtin.group:
+    name: dasadm1
+    state: present
+    gid: 2003
+
+# Needed for Db2 UDB - Installation & Operation
+- name: Add the user 'db2inst1' in support of Db2 UDB installation
+  ansible.builtin.user:
+    name: db2inst1
+    comment: "DB2 Instance Owner"
+    home: /home/db2inst1
+    shell: /bin/bash
+    uid: 2001
+    group: db2grp1
+    password: "{{ mypassword | password_hash('sha512') }}"
+
+# Needed for Db2 UDB - Security
+- name: Add the user 'db2fenc1' in support of Db2 UDB installation
+  ansible.builtin.user:
+    name: db2fenc1
+    comment: "DB2 Fenced User"
+    home: /home/db2fenc1
+    shell: /bin/bash
+    uid: 2002
+    group: db2fgrp1
+    password: "{{ mypassword | password_hash('sha512') }}"
+
+# *** Legacy - No longer needed after 10.5.x ***
+# Needed for Db2 UDB - Administration
+- name: Add the user 'dasusr1' in support of Db2 UDB installation
+  ansible.builtin.user:
+    name: dasusr1
+    comment: "DB2 DAS User"
+    home: /home/dasusr1
+    shell: /bin/bash
+    uid: 2003
+    group: dasadm1
+    password: "{{ mypassword | password_hash('sha512') }}"
+    
+- name: "Install - Ubuntu Development Packages"
+  ansible.builtin.apt:
+    pkg:
+    - build-essential 
+    - dkms
+    - m4
+    - curl
+    - valgrind
+    - ddd
+    - sysstat
+    - fio
+    - libaio1
+    - libaio-dev
+    - libbz2-dev
+    - libmotif-common
+    - libmotif-dev
+    - unixodbc
+    - unixodbc-dev
+    - perl
+    - python2
+    - python3
+    - ksh93
+    - tcsh
+    - zsh
+    
+- name: Install Db2 PreReqs
+  ansible.builtin.apt:
+    pkg:
+    - libstdc++5
+    - libstdc++6
+    - libaio-dev
+    - gcc-7
+    
+- name: Reboot target host
+  ansible.builtin.reboot:
+    reboot_timeout: 180
